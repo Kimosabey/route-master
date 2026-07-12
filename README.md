@@ -1,7 +1,7 @@
 # RouteMaster
 ### Cost-optimized AI model router — sends each prompt to the cheapest model that can actually handle it.
 
-![RouteMaster](./docs/assets/thumbnail.webp)
+![RouteMaster](./docs/assets/thumbnail.png)
 
 ![Status](https://img.shields.io/badge/Status-Working-14B8A6?style=for-the-badge)
 ![Tests](https://img.shields.io/badge/Tests-9_passing-14B8A6?style=for-the-badge)
@@ -9,7 +9,7 @@
 
 ## 📖 Overview
 
-![RouteMaster UI](./docs/assets/hero_main.webp)
+![RouteMaster UI](./docs/assets/hero_main.png)
 
 Most LLM apps send every request to one expensive model. RouteMaster scores each prompt's reasoning
 difficulty from cheap, explainable signals, then routes simple prompts to a **cheap/local** model and
@@ -53,11 +53,11 @@ Summary:  7 requests (cheap 4 / strong 3)  ·  cost saved 21% vs. all-strong
 
 ## ✨ Key Features
 
-![RouteMaster Dashboard](./docs/assets/dashboard.webp)
+![RouteMaster Dashboard](./docs/assets/dashboard.png)
 
 - **Explainable complexity scoring** — length, reasoning keywords, code detection, question depth → a 0–1 score (every decision carries its `reason`).
 
-![RouteMaster Workflow](./docs/assets/workflow.webp)
+![RouteMaster Workflow](./docs/assets/workflow.png)
 
 - **Tiered routing** with a configurable threshold (`THRESHOLD`, default 0.5).
 - **Provider-agnostic** — one `ModelProvider` interface; `MockProvider` (offline) and `OpenAIProvider` (real) ship in the box.
@@ -66,7 +66,7 @@ Summary:  7 requests (cheap 4 / strong 3)  ·  cost saved 21% vs. all-strong
 
 ## 🏗️ Architecture
 
-![RouteMaster Architecture](./docs/assets/architecture.webp)
+![RouteMaster Architecture](./docs/assets/architecture.png)
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#ffffff','lineColor':'#14B8A6','mainBkg':'#ffffff'}}}%%
