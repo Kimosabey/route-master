@@ -1,71 +1,108 @@
 # RouteMaster
-### Cost-optimized AI routing that sends each task to the cheapest model that can handle it.
+### Cost-optimized AI model router — sends each prompt to the cheapest model that can actually handle it.
 
-![Status](https://img.shields.io/badge/Status-In_Development-blue?style=for-the-badge)
+![RouteMaster](./docs/assets/thumbnail.webp)
+
+![Status](https://img.shields.io/badge/Status-Working-14B8A6?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-9_passing-14B8A6?style=for-the-badge)
 ![Category](https://img.shields.io/badge/Category-Portfolio_Project-111?style=for-the-badge)
 
 ## 📖 Overview
-RouteMaster analyzes each incoming task and routes it to a capable-but-cheap model — a local Llama model for simple work, a frontier cloud model only when the task genuinely needs it.
 
-> Part of my Senior Hybrid Engineer 2026 portfolio (`#16`). Built on the "Antigravity" model — logic, state, and UI run locally in Docker while heavy reasoning is offloaded to cloud APIs, so the whole system runs on modest hardware.
+![RouteMaster UI](./docs/assets/hero_main.webp)
+
+Most LLM apps send every request to one expensive model. RouteMaster scores each prompt's reasoning
+difficulty from cheap, explainable signals, then routes simple prompts to a **cheap/local** model and
+hard ones to a **strong/cloud** model — measuring the cost saved against an all-strong baseline.
+
+It's provider-agnostic: without an API key it runs a deterministic local/mock provider (so it — and its
+tests — work fully offline); with `OPENAI_API_KEY` set it routes to real models.
+
+> Part of my Senior Hybrid Engineer 2026 portfolio (`#16`). Antigravity model — logic runs locally, heavy
+> reasoning is offloaded to the cloud only when the prompt actually needs it.
 
 ## 🚀 Quick Start
 ```bash
-# 1. Clone
 git clone https://github.com/Kimosabey/route-master.git
 cd route-master
 
-# 2. Install
-# (see docs/GETTING_STARTED.md for the full setup)
+npm test          # 9 tests, zero dependencies (Node 22 runs the TS directly)
+npm run demo      # route a sample batch, print the cost-savings summary
+docker compose up # serve the HTTP API on :3000
+```
 
-# 3. Run
-docker compose up
+### API
+```bash
+# route a prompt
+curl -s localhost:3000/route -H 'content-type: application/json' \
+  -d '{"prompt":"Design and analyze a fault-tolerant rate limiter; prove correctness step by step."}'
+# -> {"decision":{"tier":"strong","complexity":0.52,...},"cost":0.00078,"model":"cloud-gpt",...}
+
+curl -s localhost:3000/stats   # spend vs. all-strong baseline + per-tier counts
+```
+
+### Demo output
+```
+tier    complexity   cost      prompt
+cheap        0.01   $0.00000  Translate "hello" to French.
+strong       0.52   $0.00066  Explain step by step why quicksort is O(n log n)...
+strong       0.72   $0.00069  Refactor this and debug the race condition: ```js...
+
+Summary:  7 requests (cheap 4 / strong 3)  ·  cost saved 21% vs. all-strong
 ```
 
 ## ✨ Key Features
-- Cost/performance analyzer picks the right model per request
-- Routes simple prompts local, hard prompts to the cloud
-- Transparent fallback when a model declines or fails
-- Per-route cost accounting
+
+![RouteMaster Dashboard](./docs/assets/dashboard.webp)
+
+- **Explainable complexity scoring** — length, reasoning keywords, code detection, question depth → a 0–1 score (every decision carries its `reason`).
+
+![RouteMaster Workflow](./docs/assets/workflow.webp)
+
+- **Tiered routing** with a configurable threshold (`THRESHOLD`, default 0.5).
+- **Provider-agnostic** — one `ModelProvider` interface; `MockProvider` (offline) and `OpenAIProvider` (real) ship in the box.
+- **Cross-tier fallback** — if the chosen provider errors, the request fails over to the other tier instead of dropping.
+- **Measured savings** — a cost ledger reports spend vs. the all-strong baseline; savings are computed, not asserted.
 
 ## 🏗️ Architecture
+
+![RouteMaster Architecture](./docs/assets/architecture.webp)
+
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ffffff','lineColor':'#2563eb','mainBkg':'#ffffff'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ffffff','lineColor':'#14B8A6','mainBkg':'#ffffff'}}}%%
 graph LR
-    A([Task])
-    B([Cost / Perf Analyzer])
-    C([Local Llama or Cloud LLM])
-    D([Response])
-    A --> B
-    B --> C
-    C --> D
-    style A fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af
-    style B fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af
-    style C fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af
-    style D fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af
+    A([Prompt]) --> B([Complexity Scorer])
+    B --> C{Router}
+    C -->|score < threshold| D([Cheap / Local])
+    C -->|score >= threshold| E([Strong / Cloud])
+    D --> F([Cost Ledger])
+    E --> F
+    F --> G([Response + Stats])
+    style A fill:#eff6ff,stroke:#14B8A6,stroke-width:2px,color:#0f766e
+    style C fill:#ccfbf1,stroke:#14B8A6,stroke-width:2px,color:#0f766e
+    style F fill:#eff6ff,stroke:#14B8A6,stroke-width:2px,color:#0f766e
 ```
-
-Classifying task difficulty cheaply and reliably enough that the routing decision itself does not cost more than it saves.
-
-See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the full HLD/LLD and design decisions.
+The hard part is making the routing decision *cheap and honest*: the score has to be trivial to compute
+(no extra model call) yet accurate enough that quality holds while cost drops. See
+[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## 🧰 Tech Stack
 | Layer | Technology | Role |
 | :--- | :--- | :--- |
-| Node.js | `Node.js` | Application runtime / service layer |
-| OpenAI | `OpenAI` | Cloud LLM reasoning |
-| Ollama | `Ollama` | Local LLM runtime |
+| Runtime | Node.js 22 (TypeScript, no build step) | Type-stripped execution + built-in test runner |
+| Transport | Node `http` | Zero-dependency HTTP API |
+| Providers | OpenAI-compatible / mock | Pluggable model backends |
+| Container | Docker + Compose | One-command run |
 
 ## 📚 Documentation
-- [Architecture](./docs/ARCHITECTURE.md) — high- and low-level design, decision log
-- [Getting Started](./docs/GETTING_STARTED.md) — prerequisites, setup, environment
-- [Failure Scenarios](./docs/FAILURE_SCENARIOS.md) — fault analysis and recovery
-- [Interview Q&A](./docs/INTERVIEW_QA.md) — deep-dive walkthrough
+- [Architecture](./docs/ARCHITECTURE.md) — scoring model, routing, fallback, cost accounting
+- [Getting Started](./docs/GETTING_STARTED.md) · [Failure Scenarios](./docs/FAILURE_SCENARIOS.md) · [Interview Q&A](./docs/INTERVIEW_QA.md)
 
 ## 🔭 Future Enhancements
-- Learned routing from outcome feedback
-- Latency-aware routing
-- Budget caps per tenant
+- Learned routing thresholds from outcome feedback
+- Latency-aware routing (not just cost)
+- Semantic response caching in front of the router
+- Per-tenant budget caps
 
 ## 📄 License
 Released under the MIT License.

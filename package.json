@@ -1,0 +1,16 @@
+{
+  "name": "route-master",
+  "version": "0.1.0",
+  "description": "Cost-optimized AI model router — routes each prompt to the cheapest model that can handle it.",
+  "type": "module",
+  "author": "Harshan Aiyappa",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "demo": "node src/demo.ts",
+    "test": "node --test \"test/**/*.test.ts\""
+  }
+}

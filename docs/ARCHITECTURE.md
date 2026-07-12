@@ -22,13 +22,20 @@ graph LR
 **Flow:** Task → Cost / Perf Analyzer → Local Llama or Cloud LLM → Response
 
 ## Low-Level Design (LLD)
-- **Components:** `Node.js`, `OpenAI`, `Ollama`
-- **Interfaces / contracts:** to be finalized during implementation.
-- **Data model:** to be defined per component.
+- **`complexity.ts`** — `scoreComplexity(prompt) -> { score: 0..1, signals }`. Pure function; weighted heuristics: reasoning keywords (0.5), length/tokens (0.25), code detection (0.2), question depth (0.05).
+- **`providers.ts`** — `interface ModelProvider { name; tier: 'cheap'|'strong'; costPer1kTokens; complete(prompt) }`. `MockProvider` (deterministic, offline), `OpenAIProvider` (real, key-gated).
+- **`router.ts`** — `Router.decide(prompt)` (pure) and `Router.route(prompt)` (executes, with cross-tier fallback on provider error). Threshold-based tier selection.
+- **`costLedger.ts`** — records each request; reports `totalCost`, `baselineCost` (all-strong), `savingsPct`, per-tier counts.
+- **`server.ts`** — Node `http`: `POST /route`, `GET /stats`, `GET /health`.
 
 ## Decision Log
-- **Why this stack:** **Node.js** — application runtime / service layer; **OpenAI** — cloud llm reasoning; **Ollama** — local llm runtime.
-- **Antigravity constraint:** run logic/state/UI locally; offload heavy reasoning to cloud APIs; target modest hardware.
+- **Zero runtime dependencies** — Node 22 runs the TypeScript directly (type-stripping) and the built-in test runner covers it. Keeps the router auditable and the image tiny.
+- **Provider interface over a hard vendor dependency** — the router is testable offline via `MockProvider` and swaps to real models when a key is present.
+- **Complexity heuristic, not a classifier model** — the routing decision must cost far less than it saves, so it uses cheap explainable signals rather than an extra model call.
+- **Conservative baseline** — savings are measured against the all-strong cost on the *same* token volume, which understates rather than inflates the number.
+- **Antigravity constraint** — logic runs locally; heavy reasoning is offloaded to the cloud only when the prompt crosses the threshold.
 
 ## Concept Deep Dive
-Classifying task difficulty cheaply and reliably enough that the routing decision itself does not cost more than it saves.
+The hard part is classifying task difficulty cheaply and reliably enough that the routing decision itself
+does not cost more than it saves — and doing it *explainably*, so every decision carries the `reason` it
+was made. Fallback ensures a single provider outage degrades cost/latency, never availability.

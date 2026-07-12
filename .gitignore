@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.log
+# never commit local agent/skill tooling
+.agents/
+.claude/

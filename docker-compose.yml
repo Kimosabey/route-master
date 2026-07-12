@@ -1,0 +1,12 @@
+services:
+  routemaster:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - THRESHOLD=0.5
+      # Provide a key to swap the deterministic local/mock providers for real models:
+      # - OPENAI_API_KEY=sk-...
+      # - CHEAP_MODEL=gpt-4o-mini
+      # - STRONG_MODEL=gpt-4o
