@@ -1,25 +1,32 @@
 # Getting Started — RouteMaster
 
 ## Prerequisites
-- Docker & Docker Compose
-- Node.js 20+ and/or Python 3.11+ (depending on the component)
-- API keys for any cloud services used (see `.env`)
+- **Node.js 22.6+** (runs the TypeScript directly via type-stripping — no build step). That's it for tests/demo.
+- **Docker** (optional) to run the HTTP service.
+- **An OpenAI API key** (optional) — without one, RouteMaster runs deterministic local/mock providers.
 
-## Installation
+## Run it
 ```bash
 git clone https://github.com/Kimosabey/route-master.git
 cd route-master
-docker compose up
+
+npm test          # 9 tests, zero dependencies
+npm run demo      # route a sample batch, print the cost-savings summary
+docker compose up # serve the HTTP API on :3000
 ```
 
-## Environment Variables
-| Key | Description |
-| :--- | :--- |
-| `PORT` | Service port |
-| `LOG_LEVEL` | Logging verbosity |
-| _(project-specific keys added during implementation)_ | |
+## Environment variables
+| Key | Default | Description |
+| :--- | :--- | :--- |
+| `PORT` | `3000` | HTTP port |
+| `THRESHOLD` | `0.5` | complexity ≥ this routes to the strong model |
+| `OPENAI_API_KEY` | _(unset)_ | if set, uses real models instead of the mock provider |
+| `CHEAP_MODEL` | `gpt-4o-mini` | model id for the cheap tier (when a key is set) |
+| `STRONG_MODEL` | `gpt-4o` | model id for the strong tier (when a key is set) |
 
-## Running Tests
+Copy `.env.example` to `.env` to customize. With no key, everything works fully offline.
+
+## Running tests
 ```bash
-# unit + integration test commands added during implementation
+npm test          # node --test over test/**/*.test.ts
 ```
