@@ -33,7 +33,7 @@ graph LR
 - **Provider interface over a hard vendor dependency** — the router is testable offline via `MockProvider` and swaps to real models when a key is present.
 - **Complexity heuristic, not a classifier model** — the routing decision must cost far less than it saves, so it uses cheap explainable signals rather than an extra model call.
 - **Conservative baseline** — savings are measured against the all-strong cost on the *same* token volume, which understates rather than inflates the number.
-- **Antigravity constraint** — logic runs locally; heavy reasoning is offloaded to the cloud only when the prompt crosses the threshold.
+- **Local-first constraint** — logic runs locally; heavy reasoning is offloaded to the cloud only when the prompt crosses the threshold.
 
 ## Concept Deep Dive
 The hard part is classifying task difficulty cheaply and reliably enough that the routing decision itself

@@ -24,5 +24,5 @@ A cost ledger records every request and reports spend vs. the all-strong baselin
 volume (a deliberately conservative baseline). `/stats` exposes it live — the number is measured, not asserted.
 
 ### "How does it fit your portfolio?"
-It's an AI-engineering / cost-optimization piece under my "Antigravity" model — local logic, cloud
+It's an AI-engineering / cost-optimization piece under my local-first model — local logic, cloud
 reasoning only when the prompt earns it (`#16`).

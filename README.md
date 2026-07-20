@@ -18,8 +18,8 @@ hard ones to a **strong/cloud** model — measuring the cost saved against an al
 It's provider-agnostic: without an API key it runs a deterministic local/mock provider (so it — and its
 tests — work fully offline); with `OPENAI_API_KEY` set it routes to real models.
 
-> Part of my Senior Hybrid Engineer 2026 portfolio (`#16`). Antigravity model — logic runs locally, heavy
-> reasoning is offloaded to the cloud only when the prompt actually needs it.
+> Local-first by design — routing logic runs locally, and heavy reasoning is offloaded to the
+> cloud only when the prompt actually needs it.
 
 ## 🚀 Quick Start
 ```bash
