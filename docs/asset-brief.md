@@ -1,10 +1,11 @@
 # Asset Brief — RouteMaster
 
-**Primary color signature:** `#14B8A6` (teal) · **Accent:** `#F59E0B` (amber, for cost/savings)
-**Domain motif:** a routing fork / two-lane switch — one prompt splitting toward a cheap local model vs. a strong cloud model.
-**Global style:** Modern premium, light background (white / soft grey), Inter font, rounded cards, subtle shadows, Stripe/Linear aesthetic. Output **PNG**.
+**Primary color signature:** `#14B8A6` (teal) · **Accent:** `#F59E0B` (amber, cost/savings)
+**Visual tier:** Infographic (labeled Senior-5)
+**Domain motif:** Routing fork — one prompt splitting toward a cheap local model vs. a strong cloud model.
+**Background:** Light `#F5F5F4` · **Global style:** Modern Premium V3, Inter font, rounded cards, Stripe/Linear aesthetic. Output **PNG**.
 
-Save each to `docs/assets/<name>.png`.
+Save each to `docs/assets/<name>.png`. Site sync: `node kimo-nexus/scripts/sync-portfolio-assets.mjs`.
 
 | Asset | File | Size | Source |
 |---|---|---|---|
